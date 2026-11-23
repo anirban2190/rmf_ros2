@@ -714,7 +714,7 @@ public:
 
     _edge_params.emplace_back(rmf_building_map_msgs::build<GraphParamMsg>()
       .name(_prefix + "_dock_duration")
-      .type(GraphParamMsg::TYPE_INT)
+      .type(GraphParamMsg::TYPE_DOUBLE)
       .value_int(0)
       .value_float(dock.duration().count())
       .value_string("")
@@ -733,7 +733,7 @@ public:
 
     _edge_params.emplace_back(rmf_building_map_msgs::build<GraphParamMsg>()
       .name(_prefix + "_door_open_duration")
-      .type(GraphParamMsg::TYPE_INT)
+      .type(GraphParamMsg::TYPE_DOUBLE)
       .value_int(0)
       .value_float(open.duration().count())
       .value_string("")
@@ -752,7 +752,7 @@ public:
 
     _edge_params.emplace_back(rmf_building_map_msgs::build<GraphParamMsg>()
       .name(_prefix + "_door_close_duration")
-      .type(GraphParamMsg::TYPE_INT)
+      .type(GraphParamMsg::TYPE_DOUBLE)
       .value_int(0)
       .value_float(close.duration().count())
       .value_string("")
@@ -779,7 +779,7 @@ public:
 
     _edge_params.emplace_back(rmf_building_map_msgs::build<GraphParamMsg>()
       .name(_prefix + "_lift_end_duration")
-      .type(GraphParamMsg::TYPE_INT)
+      .type(GraphParamMsg::TYPE_DOUBLE)
       .value_int(0)
       .value_float(open.duration().count())
       .value_string("")
@@ -806,7 +806,7 @@ public:
 
     _edge_params.emplace_back(rmf_building_map_msgs::build<GraphParamMsg>()
       .name(_prefix + "_lift_move_duration")
-      .type(GraphParamMsg::TYPE_INT)
+      .type(GraphParamMsg::TYPE_DOUBLE)
       .value_int(0)
       .value_float(move.duration().count())
       .value_string("")
@@ -833,7 +833,7 @@ public:
 
     _edge_params.emplace_back(rmf_building_map_msgs::build<GraphParamMsg>()
       .name(_prefix + "_lift_door_open_duration")
-      .type(GraphParamMsg::TYPE_INT)
+      .type(GraphParamMsg::TYPE_DOUBLE)
       .value_int(0)
       .value_float(open.duration().count())
       .value_string("")
@@ -860,7 +860,7 @@ public:
 
     _edge_params.emplace_back(rmf_building_map_msgs::build<GraphParamMsg>()
       .name(_prefix + "_lift_end_duration")
-      .type(GraphParamMsg::TYPE_INT)
+      .type(GraphParamMsg::TYPE_DOUBLE)
       .value_int(0)
       .value_float(close.duration().count())
       .value_string("")
@@ -871,7 +871,7 @@ public:
   {
     _edge_params.emplace_back(rmf_building_map_msgs::build<GraphParamMsg>()
       .name(_prefix + "_wait_duration")
-      .type(GraphParamMsg::TYPE_INT)
+      .type(GraphParamMsg::TYPE_DOUBLE)
       .value_int(0)
       .value_float(wait.duration().count())
       .value_string("")
@@ -890,7 +890,7 @@ public:
 
     _edge_params.emplace_back(rmf_building_map_msgs::build<GraphParamMsg>()
       .name(_prefix + "_ZonePreEntry_duration")
-      .type(GraphParamMsg::TYPE_INT)
+      .type(GraphParamMsg::TYPE_DOUBLE)
       .value_int(0)
       .value_float(zone.duration().count())
       .value_string("")
@@ -909,7 +909,7 @@ public:
 
     _edge_params.emplace_back(rmf_building_map_msgs::build<GraphParamMsg>()
       .name(_prefix + "_ZonePostEntry_duration")
-      .type(GraphParamMsg::TYPE_INT)
+      .type(GraphParamMsg::TYPE_DOUBLE)
       .value_int(0)
       .value_float(zone.duration().count())
       .value_string("")
@@ -928,7 +928,7 @@ public:
 
     _edge_params.emplace_back(rmf_building_map_msgs::build<GraphParamMsg>()
       .name(_prefix + "_ZonePreExit_duration")
-      .type(GraphParamMsg::TYPE_INT)
+      .type(GraphParamMsg::TYPE_DOUBLE)
       .value_int(0)
       .value_float(zone.duration().count())
       .value_string("")
@@ -947,7 +947,7 @@ public:
 
     _edge_params.emplace_back(rmf_building_map_msgs::build<GraphParamMsg>()
       .name(_prefix + "_ZonePostExit_duration")
-      .type(GraphParamMsg::TYPE_INT)
+      .type(GraphParamMsg::TYPE_DOUBLE)
       .value_int(0)
       .value_float(zone.duration().count())
       .value_string("")

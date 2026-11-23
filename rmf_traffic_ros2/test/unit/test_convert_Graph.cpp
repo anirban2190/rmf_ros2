@@ -15,7 +15,9 @@
  *
 */
 
+#include <chrono>
 #include <fstream>
+#include <rmf_building_map_msgs/msg/param.hpp>
 
 #include <rmf_utils/catch.hpp>
 
@@ -170,3 +172,148 @@ SCENARIO("Test conversion from rmf_building_map_msgs to rmf_traffic")
   }
 }
 */
+
+
+TEST_CASE("All event durations use the floating-point type",
+  "[duration_parameters]")
+{
+  using Graph = rmf_traffic::agv::Graph;
+  using Lane = Graph::Lane;
+  using Param = rmf_building_map_msgs::msg::Param;
+
+  const auto duration = std::chrono::seconds(5);
+
+  const auto check_event = [](const auto& event)
+    {
+      for (const bool at_entry : {true, false})
+      {
+        CAPTURE(at_entry);
+
+        Graph graph;
+        graph.add_waypoint("L1", Eigen::Vector2d(0.0, 0.0));
+        graph.add_waypoint("L1", Eigen::Vector2d(1.0, 0.0));
+
+        if (at_entry)
+        {
+          graph.add_lane(
+            Lane::Node(0, Lane::Event::make(event)),
+            Lane::Node(1));
+        }
+        else
+        {
+          graph.add_lane(
+            Lane::Node(0),
+            Lane::Node(1, Lane::Event::make(event)));
+        }
+
+        const auto message =
+          rmf_traffic_ros2::convert(graph, "test_fleet");
+        REQUIRE(message != nullptr);
+        REQUIRE(message->edges.size() == 1);
+
+        std::size_t duration_count = 0;
+        for (const auto& param : message->edges.front().params)
+        {
+          if (param.name.find("_duration") == std::string::npos)
+            continue;
+
+          CAPTURE(param.name);
+          ++duration_count;
+          CHECK(param.type == Param::TYPE_DOUBLE);
+          CHECK(param.value_float == 5000000000.0f);
+        }
+        REQUIRE(duration_count == 1);
+      }
+    };
+
+  SECTION("Dock")
+  {
+    check_event(Lane::Dock("dock", duration));
+  }
+  SECTION("DoorOpen")
+  {
+    check_event(Lane::DoorOpen("door", duration));
+  }
+  SECTION("DoorClose")
+  {
+    check_event(Lane::DoorClose("door", duration));
+  }
+  SECTION("LiftSessionBegin")
+  {
+    check_event(Lane::LiftSessionBegin("lift", "L1", duration));
+  }
+  SECTION("LiftMove")
+  {
+    check_event(Lane::LiftMove("lift", "L1", duration));
+  }
+  SECTION("LiftDoorOpen")
+  {
+    check_event(Lane::LiftDoorOpen("lift", "L1", duration));
+  }
+  SECTION("LiftSessionEnd")
+  {
+    check_event(Lane::LiftSessionEnd("lift", "L1", duration));
+  }
+  SECTION("Wait")
+  {
+    check_event(Lane::Wait(duration));
+  }
+  SECTION("ZonePreEntry")
+  {
+    check_event(Lane::ZonePreEntry("zone", duration));
+  }
+  SECTION("ZonePostEntry")
+  {
+    check_event(Lane::ZonePostEntry("zone", duration));
+  }
+  SECTION("ZonePreExit")
+  {
+    check_event(Lane::ZonePreExit("zone", duration));
+  }
+  SECTION("ZonePostExit")
+  {
+    check_event(Lane::ZonePostExit("zone", duration));
+  }
+}
+
+TEST_CASE("Reader accepts legacy and corrected door duration labels",
+  "[duration_compatibility]")
+{
+  using Graph = rmf_traffic::agv::Graph;
+  using Param = rmf_building_map_msgs::msg::Param;
+
+  Graph graph;
+  graph.add_waypoint("L1", Eigen::Vector2d(0.0, 0.0));
+  graph.add_waypoint("L1", Eigen::Vector2d(1.0, 0.0));
+  graph.add_lane(
+    Graph::Lane::Node(
+      0, Graph::Lane::Event::make(
+        Graph::Lane::DoorOpen("door", std::chrono::seconds(5)))),
+    Graph::Lane::Node(1));
+
+  const auto message = rmf_traffic_ros2::convert(graph, "test_fleet");
+  REQUIRE(message != nullptr);
+  REQUIRE(message->edges.size() == 1);
+
+  for (const auto type : {Param::TYPE_INT, Param::TYPE_DOUBLE})
+  {
+    CAPTURE(type);
+    bool found = false;
+    for (auto& param : message->edges.front().params)
+    {
+      if (param.name == "entry_door_open_duration")
+      {
+        param.type = type;
+        found = true;
+      }
+    }
+    REQUIRE(found);
+
+    const auto restored = rmf_traffic_ros2::convert(*message);
+    REQUIRE(restored.has_value());
+    REQUIRE(restored->num_lanes() == 1);
+    const auto* event = restored->get_lane(0).entry().event();
+    REQUIRE(event != nullptr);
+    CHECK(event->duration() == std::chrono::seconds(5));
+  }
+}
